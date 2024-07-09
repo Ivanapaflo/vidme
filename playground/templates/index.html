@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidme</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" 
+    crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/f4f3139505.js" crossorigin="anonymous"></script>
+
+    <style>
+        body{
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            max-height: 100vh;
+        }
+       
+        .topControls{
+            color: white;
+            position: fixed;
+            width: 90%;
+            padding: 20px;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            z-index: 999;
+        }
+        .topControls div{
+            display: flex;
+            align-items: center;
+        }
+        .topControls div i{
+            margin-right: 50px;
+        }
+        .topControls div img{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        video{
+            height: 600px;
+        }
+        span{
+            color: white;
+            background-color: rgb(47, 46, 46);
+            padding: 20px;
+            border-radius: 50%;
+        }
+        .videoWrapper{
+            color: white;
+
+        }
+        ul{
+            position: absolute;
+            right: 10px;
+            bottom: 50px;
+            list-style: none;
+            font-size: 30px;
+        }
+        ul li{
+            margin: 30px;
+        }
+        .account{
+            display: none;
+            width: 0;
+           overflow: hidden;
+        }
+        .active{
+            position: fixed;
+            right: 70px;
+            top: 70px;
+            width: unset;
+            padding: 20px;
+            background-color: gold;
+            color: white;
+        }
+        .active a{
+            text-decoration: none;
+            color: white;
+        }
+        .sharebox{
+            display: none;
+            width: 0;
+            overflow: hidden;
+        }
+        .showSharebox{
+            position: fixed;
+            bottom: 50px;
+            right: 100px;
+            padding: 20px;
+            background-color: white;
+            font-size: 15px;
+            display: block;
+            width: unset;
+        }
+        .showSharebox div{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            color: black;
+        }
+
+        .showSharebox div div{
+            display: block;
+            margin: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .showSharebox div a{
+            text-decoration: none;
+            color: black;
+        }
+        .showSharebox div i{
+            font-size: 20px;
+        }
+        .fa-whatsapp{
+            color: green;
+        }
+
+        #commentPaneWrapper{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background-color: rgb(227, 240, 240);
+            border-radius: 5px;
+            z-index: 2000;
+            display: none;
+        }
+        #commentPane{
+            display: flex;
+            background-color: inherit;
+        }
+        #commentPane #msg{
+            background-color: inherit;
+            width: 60%;
+            padding: 10px;
+            border: none;
+        }
+        #commentPane #send{
+            background-color: inherit;
+            font-size: 22px;
+            border: none;
+        }
+        #darkBackground{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background-color: black;
+            opacity: 0.5;
+        }
+        #preview{
+            display:none; 
+            text-align:left;
+            position: relative;
+            margin: 10px;
+        }
+        #preview span{
+            font-size: 30px;
+            color: rgb(237, 29, 29);
+            text-align: right;
+            position: absolute;
+            right: 15px;
+            top: 0px;
+        }
+
+
+
+        @media (max-width:720px) {
+            .prev{
+                position: absolute;
+                left: 10px;
+                z-index: 100;
+            }
+           
+            .nxt{
+                position: absolute;
+                right: 10px;
+            }
+           
+            
+            .videoWrapper{
+                width: 100%;
+            }
+            video{
+                width: 100%;
+                max-width: 100%;
+            }
+            .showSharebox{
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body >
+    <section class="topControls">
+        <div class="topControls_left">
+            <i class="fa-solid fa-chevron-left"></i>
+            <h3>Shorts</h3>
+        </div>
+        <div>
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <img src="/static/avatar.jpg" onclick="showAccount()" alt="">
+            <div class="account">
+               <a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i>logout</a> 
+            </div>
+        </div>
+    </section>
+    {% if show_prev %}
+    <a href="{% url 'Nav' nav|add:'-1' %}">
+        <span class="prev">
+            <i class="fa-solid fa-chevron-left"></i>
+        </span> 
+    </a> 
+    {% endif %} 
+        <section class="videoWrapper">
+            <video controls autoplay>
+                <source src="/media/{{movie.video_file}}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <ul>
+                <li>
+                    <i class="fa-regular fa-heart"></i>
+
+                </li>
+                <li onclick="comment('')">
+                    <i class="fa-regular fa-comment"></i>
+                </li>
+                <li>
+                    <i class="fa-solid fa-share" onclick="showSharebox()"></i>
+                    <div class="sharebox">
+                        <div>
+                            <div onclick="copyToClipboard()">
+                                <i class="fas fa-copy"></i>
+                                <br>
+                                Copy link
+                            </div>
+                            <div>
+                                <a href="">
+                                    <i class="fa fa-whatsapp"> </i>
+                                    <br>
+                                    Whatsapp
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <main>
+                {{movie.title}}
+            </main>
+        </section>
+        {% if show_next  %}
+        <a href="{% url 'Nav' nav|add:'+1' %}" class="nxt">
+            <span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </span>
+        </a>
+        {% endif %}
+
+        <!-- ==================adding darkBackground=================== -->
+
+        <div id="darkBackground" onclick="handleClick()">
+
+        </div>
+        <script>
+            function handleClick(){
+                document.querySelector('#darkBackground').style.display='none'
+                    // document.querySelector('#share_option').style.display='none'
+                    document.querySelector('#commentPaneWrapper').style.display='none'
+        
+            }
+        </script>
+
+
+        <div id="commentPaneWrapper">
+            <div>
+               <h1>
+                   {{movie.title}}
+
+               </h1> 
+               <p>
+                   {{movie.Description}}
+
+               </p>
+            </div>
+            <div id="preview">
+                <img src="" alt="" id="images" width="100px" height="100px">
+                <span onclick="clearCom_att()">
+                x</span>
+            </div>
+            <div id="commentPane">
+                <input type="hidden" value="" id="postId">
+                <input type="hidden" value="" id="user_id">
+                <input type="text" placeholder="Comment" id="comment">
+                <label for="commentAttachment">
+                    <img src="photos/imgIcon.png" width="50px" alt="">
+                </label>
+                <input type="file" id="commentAttachment" hidden>
+                <input type="submit" id="send" onclick='SaveComment()' value="💬">
+
+            </div>
+        </div >
+</body>
+<script>
+    function showAccount(){
+        if(document.querySelector(".account").classList.contains("active")){
+            document.querySelector(".account").classList.remove("active")
+        }else{
+            document.querySelector(".account").classList.add("active")
+
+        }
+    }
+    function showSharebox(){
+        console.log("share")
+        if(document.querySelector(".sharebox").classList.contains("showSharebox")){
+            document.querySelector(".sharebox").classList.remove("showSharebox")
+        }else{
+            document.querySelector(".sharebox").classList.add("showSharebox")
+
+        }
+    }
+
+    function copyToClipboard() {
+    var tempInput = document.createElement("input");
+    tempInput.value = window.location.href;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    document.querySelector(".sharebox").classList.remove("showSharebox")
+    alert("Video link copied to clipboard!");
+}
+
+
+function comment(postId){
+
+    if ( document.querySelector('#darkBackground').style.display=='block'&&
+        document.querySelector('#commentPaneWrapper').style.display=='block') {
+            document.querySelector('#darkBackground').style.display='none'
+            document.querySelector('#commentPaneWrapper').style.display='none'
+            document.querySelector('#comment').value=""
+            document.querySelector('#preview').style.display='none'
+            document.querySelector('#commentAttachment').value=''
+            
+        
+    } else {
+        document.querySelector('#darkBackground').style.display='block'
+        document.querySelector('#commentPaneWrapper').style.display='block'
+        document.querySelector('#postId').value=postId
+
+    }
+}
+
+function clearCom_att(){
+    document.querySelector('#preview').style.display='none'
+    document.querySelector('#commentAttachment').value=''
+}
+</script>
+</html>
